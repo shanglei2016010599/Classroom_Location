@@ -3,13 +3,23 @@ package com.example.classroom_location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    private DrawerLayout mDrawerLayout;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -33,6 +43,51 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        ActionBar actionBar = getSupportActionBar();
+        if ( actionBar != null ){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
+
+        /* 左侧菜单栏按钮点击事件 */
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch ( menuItem.getItemId() ) {
+                    case R.id.nav_call:
+                        Toast.makeText(MainActivity.this, "You clicked call",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_friends:
+                        Toast.makeText(MainActivity.this, "You clicked friends",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_location:
+                        Toast.makeText(MainActivity.this, "You clicked location",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_mail:
+                        Toast.makeText(MainActivity.this, "You clicked mail",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_task:
+                        Toast.makeText(MainActivity.this, "You clicked task",
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        mDrawerLayout.closeDrawers();
+                        break;
+                }
+                return true;
+            }
+        });
+
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         replaceFragment(new ClassroomFragment());
@@ -53,4 +108,31 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    /* toolbar按钮的点击事件 */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.backup:
+                Toast.makeText(this, "You clicked Backup",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.delete:
+                Toast.makeText(this, "You clicked delete",
+                        Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.settings:
+                Toast.makeText(this, "You clicked settings",
+                        Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+    }
 }
