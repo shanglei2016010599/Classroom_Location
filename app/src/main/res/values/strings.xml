@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Classroom_Location</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_classroom">课堂</string>
+    <string name="title_forum">论坛</string>
+    <string name="message_classroom">这是教室碎片</string>
+    <string name="message_forum">这是论坛碎片</string>
 </resources>
