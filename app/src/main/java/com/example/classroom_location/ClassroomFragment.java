@@ -42,7 +42,7 @@ public class ClassroomFragment extends Fragment {
 
         initStudents();
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(view.getContext(), 4);
+        GridLayoutManager layoutManager = new GridLayoutManager(view.getContext(), 8);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new StudentAdapter(studentList);
         recyclerView.setAdapter(adapter);
