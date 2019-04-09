@@ -1,6 +1,7 @@
 package com.example.classroom_location;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -39,13 +40,25 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, final int i) {
         if ( mContext == null ){
             mContext = viewGroup.getContext();
         }
         View view = LayoutInflater.from(mContext).inflate(R.layout.student_item, viewGroup,
                 false);
-        return new ViewHolder(view);
+        final ViewHolder holder = new ViewHolder(view);
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int postion = holder.getAdapterPosition();
+                Student student = mStudentList.get(postion);
+                Intent intent = new Intent(mContext, StudentActivity.class);
+                intent.putExtra(StudentActivity.STUDENT_NAME, student.getName());
+                intent.putExtra(StudentActivity.STUDENT_IMAGE_ID, student.getImageId());
+                mContext.startActivity(intent);
+            }
+        });
+        return holder;
     }
 
     @Override
