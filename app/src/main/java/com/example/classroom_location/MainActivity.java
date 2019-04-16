@@ -1,5 +1,6 @@
 package com.example.classroom_location;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -120,17 +121,10 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
-            case R.id.backup:
-                Toast.makeText(this, "You clicked Backup",
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.delete:
-                Toast.makeText(this, "You clicked delete",
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.settings:
-                Toast.makeText(this, "You clicked settings",
-                        Toast.LENGTH_SHORT).show();
+            case R.id.QRCode:
+                Intent intent = new Intent(MainActivity.this,
+                        QRScannerActivity.class);
+                startActivity(intent);
                 break;
         }
         return true;

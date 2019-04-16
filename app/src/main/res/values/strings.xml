@@ -6,5 +6,9 @@
     <string name="message_forum">这是论坛碎片</string>
     <string name="mail">tonygreendev@gamil.com</string>
     <string name="name">Tony Green</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="scan_text">扫一扫</string>
+    <string name="toolbar_QRCode_title">Scan</string>
+    <string name="remember_password_msg">记住密码</string>
 
 </resources>
