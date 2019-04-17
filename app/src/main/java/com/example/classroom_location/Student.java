@@ -1,6 +1,6 @@
 package com.example.classroom_location;
 
-public class Student {
+public class Student{
 
     private String name;
 
@@ -26,4 +26,6 @@ public class Student {
     public void setImageId(int imageId) {
         this.imageId = imageId;
     }
+
+
 }

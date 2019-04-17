@@ -10,5 +10,8 @@
     <string name="scan_text">扫一扫</string>
     <string name="toolbar_QRCode_title">Scan</string>
     <string name="remember_password_msg">记住密码</string>
+    <string name="LogIn_account_str">请输入学号：</string>
+    <string name="LogIn_password_str">请输入密码：</string>
+    <string name="LogIn_btn_msg">登录</string>
 
 </resources>
