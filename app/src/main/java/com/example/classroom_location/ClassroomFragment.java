@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class ClassroomFragment extends Fragment {
@@ -63,7 +64,7 @@ public class ClassroomFragment extends Fragment {
     /* 初始化方法 */
     public void initStudents(){
         studentList.clear();
-        for ( int i = 0; i < 50; i++ ){
+        for ( int i = 0; i < 48; i++ ){
             Random random = new Random();
             int index = random.nextInt(students.length);
             studentList.add(students[index]);
@@ -81,7 +82,7 @@ public class ClassroomFragment extends Fragment {
                     e.printStackTrace();
                 }
                 /* 需要通过获取活动，才能成功使用runOnUiThread()方法 */
-                getActivity().runOnUiThread(new Runnable(){
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable(){
                     @Override
                     public void run() {
                         initStudents();

@@ -13,5 +13,13 @@
     <string name="LogIn_account_str">请输入学号：</string>
     <string name="LogIn_password_str">请输入密码：</string>
     <string name="LogIn_btn_msg">登录</string>
+    <string name="nav_menu_title1">Call</string>
+    <string name="nav_menu_title2">Friends</string>
+    <string name="nav_menu_title3">Location</string>
+    <string name="nav_menu_title4">Mail</string>
+    <string name="nav_meu_title5">Tasks</string>
+    <string name="dialog_msg_1">相册</string>
+    <string name="dialog_msg_2">拍照</string>
+    <string name="dialog_img_3">取消</string>
 
 </resources>

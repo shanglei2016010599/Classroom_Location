@@ -21,19 +21,25 @@
 
         <EditText
             android:id="@+id/account_edit"
+            android:theme="@style/MyEditText"
+            android:textCursorDrawable="@drawable/cursor_color"
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/account_2"
+            android:drawableStart="@drawable/account"
+            android:textColor="#FFFFFF"
             android:hint="@string/LogIn_account_str"
             android:inputType="number" />
 
         <EditText
             android:layout_marginTop="10dp"
             android:id="@+id/password_edit"
+            android:theme="@style/MyEditText"
+            android:textCursorDrawable="@drawable/cursor_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/password_2"
+            android:drawableStart="@drawable/password"
+            android:textColor="#FFFFFF"
             android:inputType="numberPassword"
             android:hint="@string/LogIn_password_str"/>
 
@@ -44,6 +50,7 @@
             android:orientation="horizontal">
             <CheckBox
                 android:id="@+id/remember_password"
+                android:buttonTint="@color/cardview_light_background"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
