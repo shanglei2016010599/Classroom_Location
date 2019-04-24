@@ -20,8 +20,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private EditText account_edit;
     private EditText password_edit;
     private SharedPreferences preferences;
+    private final static String mAccount = "2016010599";
+    private final static String mPassword = "123456";
 
-//    private final String TAG = "LoginActivity";
+    //    private final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +38,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         password_edit = findViewById(R.id.password_edit);
         Button logIn = findViewById(R.id.Login_btn);
         boolean isRemember = preferences.getBoolean("remember_password", false);
+        boolean autoLogin = preferences.getBoolean("isAuto", false);
         if (isRemember){
-           init();
+            if (autoLogin){
+                AutoLogin();
+            }
+            init();
         }
         logIn.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        String mAccount = "2016010599";
-        String mPassword = "123456";
+
         if (v.getId() == R.id.Login_btn) {
             String account = account_edit.getText().toString();
             String password = password_edit.getText().toString();
@@ -55,7 +60,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                     editor.putBoolean("remember_password", true);
                     editor.putString("account", account);
                     editor.putString("password", password);
-
+                    editor.putBoolean("isAuto", true);
                 } else {
                     editor.clear();
                 }
@@ -69,7 +74,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
-
+    private void AutoLogin(){
+        String account = preferences.getString("account", "");
+        String password = preferences.getString("password", "");
+        if (account != null && password != null){
+            if (account.equals(mAccount) && password.equals(mPassword)){
+                Intent intent = new Intent(Login.this, MainActivity.class);
+                startActivity(intent);
+            }
+        }
+    }
 
     private void init(){
         //  将账号和密码都设置到文本框中

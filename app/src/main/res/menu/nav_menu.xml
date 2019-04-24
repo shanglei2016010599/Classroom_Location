@@ -21,5 +21,9 @@
             android:id="@+id/nav_task"
             android:icon="@drawable/nav_task"
             android:title="@string/nav_meu_title5"/>
+        <item
+            android:id="@+id/nav_quit"
+            android:icon="@drawable/quit"
+            android:title="@string/nav_menu_title6"/>
     </group>
 </menu>

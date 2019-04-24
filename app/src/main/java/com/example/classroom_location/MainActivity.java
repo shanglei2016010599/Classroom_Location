@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -59,9 +61,9 @@ public class MainActivity extends AppCompatActivity{
     private CircleImageView icon_image;
     private Uri imageUri;
 
+    /* 碎片切换 */
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
@@ -117,6 +119,15 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.nav_task:
                         Toast.makeText(MainActivity.this, "You clicked task",
                                 Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_quit:
+                        SharedPreferences.Editor editor =
+                                getSharedPreferences("com.example.classroom_location_preferences",
+                                        MODE_PRIVATE).edit();
+                        editor.putBoolean("isAuto", false);
+                        editor.apply();
+                        Intent intent = new Intent(MainActivity.this, Login.class);
+                        startActivity(intent);
                         break;
                     default:
                         mDrawerLayout.closeDrawers();
