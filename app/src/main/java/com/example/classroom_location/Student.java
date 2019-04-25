@@ -6,9 +6,15 @@ public class Student{
 
     private int imageId;
 
-    public Student(String name, int imageId) {
+    private int col;
+
+    private int row;
+
+    public Student(String name, int imageId, int row, int col) {
         this.name = name;
         this.imageId = imageId;
+        this.row = row;
+        this.col = col;
     }
 
     public String getName() {
@@ -25,6 +31,22 @@ public class Student{
 
     public void setImageId(int imageId) {
         this.imageId = imageId;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
     }
 
 

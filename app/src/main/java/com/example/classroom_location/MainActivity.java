@@ -12,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -53,6 +52,7 @@ public class MainActivity extends AppCompatActivity{
 
     private DrawerLayout mDrawerLayout;
     private Dialog dialog;
+
     private final static String username = "Dell";
     private final static String mail = "Dell@gmail.com";
 
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity{
     private void ChangeHeadIcon() {
         @SuppressLint("InflateParams") View view = getLayoutInflater().inflate
                 (R.layout.photo_choose_dialog, null);
-        Button takephoto = view.findViewById(R.id.TakePhoto);
+        Button takePhoto = view.findViewById(R.id.TakePhoto);
         Button choose = view.findViewById(R.id.Choose);
         Button cancel = view.findViewById(R.id.Cancel);
         dialog = new Dialog(this, R.style.transparentFrameWindowStyle);
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity{
         // 设置点击外围解散
         dialog.setCanceledOnTouchOutside(true);
         /* 按钮点击事件 */
-        takephoto.setOnClickListener(new View.OnClickListener() {
+        takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 take();
@@ -378,5 +378,4 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

@@ -43,7 +43,7 @@ public class StudentActivity extends AppCompatActivity {
 
     private String generateStudentContent(String studentName){
         StringBuilder studentContent = new StringBuilder();
-        for ( int i = 0; i < 500; i++ ){
+        for ( int i = 0; i < 5; i++ ){
             studentContent.append(studentName);
         }
         return studentContent.toString();

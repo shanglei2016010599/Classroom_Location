@@ -50,7 +50,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-
         if (v.getId() == R.id.Login_btn) {
             String account = account_edit.getText().toString();
             String password = password_edit.getText().toString();

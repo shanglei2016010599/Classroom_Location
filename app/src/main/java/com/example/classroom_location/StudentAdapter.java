@@ -1,5 +1,6 @@
 package com.example.classroom_location;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -17,16 +18,16 @@ import java.util.List;
 
 public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHolder> {
 
-    public Context mContext;
+    private Context mContext;
 
     private List<Student> mStudentList;
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         ImageView studentImage;
         TextView studentName;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = (CardView) itemView;
             studentImage = itemView.findViewById(R.id.student_image);
@@ -34,7 +35,7 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         }
     }
 
-    public StudentAdapter(List<Student> studentList){
+    StudentAdapter(List<Student> studentList){
         mStudentList = studentList;
     }
 
@@ -61,10 +62,11 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         return holder;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull StudentAdapter.ViewHolder viewHolder, int i) {
         Student student = mStudentList.get(i);
-        viewHolder.studentName.setText(student.getName());
+        viewHolder.studentName.setText("    " + student.getRow() + "-" + student.getCol() + "    ");
         Glide.with(mContext).load(student.getImageId()).into(viewHolder.studentImage);
     }
 

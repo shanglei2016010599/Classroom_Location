@@ -19,13 +19,18 @@ import java.util.Random;
 
 public class ClassroomFragment extends Fragment {
 
-    private Student[] students = {
-            new Student("第一张图", R.drawable.image1),
-            new Student("第二张图", R.drawable.image2),
-            new Student("第三张图", R.drawable.image3),
-            new Student("第四张图", R.drawable.image4),
-            new Student("第五张图", R.drawable.image5),
-            new Student("第六张图", R.drawable.image6),
+//    private Student[] students = {
+//            new Student("第一张图", R.drawable.image1),
+//            new Student("第二张图", R.drawable.image2),
+//            new Student("第三张图", R.drawable.image3),
+//            new Student("第四张图", R.drawable.image4),
+//            new Student("第五张图", R.drawable.image5),
+//            new Student("第六张图", R.drawable.image6),
+//    };
+
+    private int[] ImageId = {
+            R.drawable.image1, R.drawable.image2, R.drawable.image3,
+            R.drawable.image4, R.drawable.image5, R.drawable.image6,
     };
 
     private List<Student> studentList = new ArrayList<>();
@@ -66,8 +71,17 @@ public class ClassroomFragment extends Fragment {
         studentList.clear();
         for ( int i = 0; i < 48; i++ ){
             Random random = new Random();
-            int index = random.nextInt(students.length);
-            studentList.add(students[index]);
+            int index = random.nextInt(6);
+            int row, col;
+            if ( (i + 1) % 8 != 0){
+                row = (i + 1) / 8 + 1;
+                col = (i + 1) % 8;
+            } else {
+                row = (i + 1) / 8;
+                col = 8;
+            }
+            Student student = new Student("第" + (i + 1) + "个同学", ImageId[index], row, col);
+            studentList.add(student);
         }
     }
 
