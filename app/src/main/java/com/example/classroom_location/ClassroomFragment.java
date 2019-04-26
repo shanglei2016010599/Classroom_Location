@@ -1,6 +1,7 @@
 package com.example.classroom_location;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,9 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +44,30 @@ public class ClassroomFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private final static String TAG = "ClassroomFragment";
+
+    private View view;
+
+    private int screenWidth;
+
+    private int screenHeight;
+
     @SuppressLint("ResourceAsColor")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.classroom_fragment, container, false);
+        view = inflater.inflate(R.layout.classroom_fragment, container, false);
 
         initStudents();
+        getAndroiodScreenProperty();
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setMinimumWidth(screenWidth / 8);
+        recyclerView.setMinimumHeight(screenHeight / 6);
+//        ImageView imageView = view.findViewById(R.id.student_image);
+//        imageView.setMaxWidth(screenWidth / 8);
+//        imageView.setMaxHeight(screenHeight / 6);
+
         GridLayoutManager layoutManager = new GridLayoutManager(view.getContext(), 8);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new StudentAdapter(studentList);
@@ -106,6 +126,21 @@ public class ClassroomFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    /* 获取当前屏幕的宽度、高度 */
+    public void getAndroiodScreenProperty(){
+        WindowManager wm = (WindowManager) view.getContext().getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;// 屏幕宽度（像素）
+        int height= dm.heightPixels; // 屏幕高度（像素）
+        float density = dm.density;//屏幕密度（0.75 / 1.0 / 1.5）
+//        int densityDpi = dm.densityDpi;//屏幕密度dpi（120 / 160 / 240）
+        //屏幕宽度算法:屏幕宽度（像素）/屏幕密度
+        screenWidth = (int) (width/density);//屏幕宽度(dp)
+        screenHeight = (int)(height/density);//屏幕高度(dp)
+        Log.e(TAG, screenWidth + "======" + screenHeight);
     }
 
 }

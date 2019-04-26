@@ -16,7 +16,8 @@
             android:id="@+id/student_image"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/todo" />
 
         <TextView
             android:id="@+id/student_name"

@@ -22,5 +22,6 @@
     <string name="dialog_msg_2">拍照</string>
     <string name="dialog_img_3">取消</string>
     <string name="nav_menu_title6">退出登录</string>
+    <string name="todo">TODO</string>
 
 </resources>
