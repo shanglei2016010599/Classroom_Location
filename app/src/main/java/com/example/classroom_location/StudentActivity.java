@@ -17,7 +17,11 @@ public class StudentActivity extends AppCompatActivity {
 
     public static final String STUDENT_NAME = "student_name";
 
-    public static final String STUDENT_IMAGE_ID = "fruit_image_id";
+    public static final String STUDENT_IMAGE_ID = "student_image_id";
+
+    public static final String STUDENT_IMAGE_URL = "student_image_url";
+
+    public static final String STUDENT_MESSAGE = "student_message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +30,8 @@ public class StudentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String studentName = intent.getStringExtra(STUDENT_NAME);
         int studentImageId = intent.getIntExtra(STUDENT_IMAGE_ID, 0);
+        String studentImageUrl = intent.getStringExtra(STUDENT_IMAGE_URL);
+        String studentMessage = intent.getStringExtra(STUDENT_MESSAGE);
         Toolbar toolbar = findViewById(R.id.toolbar);
         CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         ImageView studentImageView = findViewById(R.id.student_image_view);
@@ -36,9 +42,17 @@ public class StudentActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         collapsingToolbarLayout.setTitle(studentName);
-        Glide.with(this).load(studentImageId).into(studentImageView);
-        String studentContent = generateStudentContent(studentName);
-        studentContentText.setText(studentContent);
+        if (studentImageUrl != null){
+            Glide.with(this).load(studentImageUrl).into(studentImageView);
+        } else {
+            Glide.with(this).load(studentImageId).into(studentImageView);
+        }
+        if (studentMessage != null){
+            studentContentText.setText(studentMessage);
+        } else {
+            String studentContent = generateStudentContent(studentName);
+            studentContentText.setText(studentContent);
+        }
     }
 
     private String generateStudentContent(String studentName){
@@ -51,10 +65,9 @@ public class StudentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

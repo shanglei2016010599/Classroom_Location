@@ -64,7 +64,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         if (v.getId() == R.id.Login_btn) {
             account = account_edit.getText().toString();
             password = password_edit.getText().toString();
-            HttpUtil.sendOkHttpRequest("http://192.168.0.101:8080/test1_war_exploded/LoginServlet?" +
+            HttpUtil.sendOkHttpRequest("http://192.168.0.102:8080/test1_war_exploded/LoginServlet?" +
                     "account=" + account +
                     "&password=" + password, new okhttp3.Callback() {
                 @Override
@@ -127,7 +127,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private void AutoLogin(){
         String account = preferences.getString("account", "");
         String password = preferences.getString("password", "");
-        HttpUtil.sendOkHttpRequest("http://192.168.0.101:8080/test1_war_exploded/LoginServlet?" +
+        HttpUtil.sendOkHttpRequest("http://192.168.0.102:8080/test1_war_exploded/LoginServlet?" +
                 "account=" + account +
                 "&password=" + password, new okhttp3.Callback() {
             @Override

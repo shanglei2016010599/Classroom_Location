@@ -51,11 +51,13 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int postion = holder.getAdapterPosition();
-                Student student = mStudentList.get(postion);
+                int position = holder.getAdapterPosition();
+                Student student = mStudentList.get(position);
                 Intent intent = new Intent(mContext, StudentActivity.class);
                 intent.putExtra(StudentActivity.STUDENT_NAME, student.getName());
                 intent.putExtra(StudentActivity.STUDENT_IMAGE_ID, student.getImageId());
+                intent.putExtra(StudentActivity.STUDENT_IMAGE_URL, student.getUrl());
+                intent.putExtra(StudentActivity.STUDENT_MESSAGE, student.getMessage());
                 mContext.startActivity(intent);
             }
         });
@@ -66,8 +68,16 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull StudentAdapter.ViewHolder viewHolder, int i) {
         Student student = mStudentList.get(i);
-        viewHolder.studentName.setText("    " + student.getRow() + "-" + student.getCol() + "    ");
-        Glide.with(mContext).load(student.getImageId()).into(viewHolder.studentImage);
+        if (student.getStatus().equals("1")){
+            viewHolder.studentName.setText(student.getName());
+        } else {
+            viewHolder.studentName.setText("    " + student.getRow() + "-" + student.getCol() + "    ");
+        }
+        if (student.getImageId() == -1){
+            Glide.with(mContext).load(student.getUrl()).into(viewHolder.studentImage);
+        } else {
+            Glide.with(mContext).load(student.getImageId()).into(viewHolder.studentImage);
+        }
     }
 
     @Override

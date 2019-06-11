@@ -378,4 +378,5 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
