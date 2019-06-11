@@ -74,5 +74,4 @@
             android:text="@string/LogIn_btn_msg"/>
     </LinearLayout>
 
-
 </LinearLayout>
