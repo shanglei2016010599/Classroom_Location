@@ -64,7 +64,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         if (v.getId() == R.id.Login_btn) {
             account = account_edit.getText().toString();
             password = password_edit.getText().toString();
-            HttpUtil.sendOkHttpRequest("http://192.168.0.102:8080/test1_war_exploded/LoginServlet?" +
+            HttpUtil.sendOkHttpRequest("http://192.168.0.103:8080/test1_war_exploded/LoginServlet?" +
                     "account=" + account +
                     "&password=" + password, new okhttp3.Callback() {
                 @Override
@@ -79,7 +79,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     assert response.body() != null;
-                    if (response.body().string().equals("success")){
+                    String result = response.body().string();
+                    if (result.equals("success")){
                         Looper.prepare();
                         Toast.makeText(Login.this, "登录成功",
                                 Toast.LENGTH_SHORT).show();
@@ -96,7 +97,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                         Intent intent = new Intent(Login.this, MainActivity.class);
                         startActivity(intent);
                         Looper.loop();
-                    } else if (response.body().string().equals("fail")){
+                    } else if (result.equals("fail")){
                         Toast.makeText(Login.this, "账号或密码错误",
                                 Toast.LENGTH_SHORT).show();
                         Looper.loop();
@@ -127,7 +128,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private void AutoLogin(){
         String account = preferences.getString("account", "");
         String password = preferences.getString("password", "");
-        HttpUtil.sendOkHttpRequest("http://192.168.0.102:8080/test1_war_exploded/LoginServlet?" +
+        HttpUtil.sendOkHttpRequest("http://192.168.0.103:8080/test1_war_exploded/LoginServlet?" +
                 "account=" + account +
                 "&password=" + password, new okhttp3.Callback() {
             @Override
@@ -142,11 +143,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 assert response.body() != null;
-                if (response.body().string().equals("success")){
+                String result = response.body().string();
+                if (result.equals("success")){
                     Log.d(TAG, "onResponse: 自动登录成功");
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     startActivity(intent);
-                } else if (response.body().string().equals("fail")){
+                } else if (result.equals("fail")){
                     Looper.prepare();
                     Toast.makeText(Login.this, "账号或密码错误",
                             Toast.LENGTH_SHORT).show();

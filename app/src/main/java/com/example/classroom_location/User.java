@@ -14,6 +14,36 @@ public class User {
 
     private String status;
 
+    private String count;
+
+    private String account;
+
+    private String password;
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
     public String getId() {
         return id;
     }
@@ -60,6 +90,25 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public User(String id, String account, String password, String name, String url, String message,
+                String status, String count, String location){
+        this.id = id;
+        this.account = account;
+        this.password = password;
+        this.name = name;
+        if (url != null){
+            this.url = url;
+        }
+        if (url != null){
+            this.message = message;
+        }
+        this.status = status;
+        this.count = count;
+        if (location != null){
+            this.location = location;
+        }
     }
 
 }

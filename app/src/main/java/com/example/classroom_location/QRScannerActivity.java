@@ -1,15 +1,20 @@
 package com.example.classroom_location;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -24,6 +29,9 @@ import com.google.zxing.Result;
 
 import java.io.IOException;
 import java.util.Vector;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 
 public class QRScannerActivity extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -41,7 +49,17 @@ public class QRScannerActivity extends AppCompatActivity implements SurfaceHolde
     private static final float BEEP_VOLUME = 0.10f;
     private boolean vibrate;
 
+    private static final String TAG = "QRScannerActivity";
+    private static final int CHECK_IN_OK = 4;
+    private static final int CHECK_IN_ERRPR = 5;
+    private static String resultString;
+    private String name;
+    private String account;
+    private String Location;
+    private String status;
+    private Handler Checkhandler;
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +75,31 @@ public class QRScannerActivity extends AppCompatActivity implements SurfaceHolde
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 1);
         }
+
+        final Intent intent = getIntent();
+        name = intent.getStringExtra("name");
+        account = intent.getStringExtra("account");
+        status = intent.getStringExtra("status");
+
+        Checkhandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case CHECK_IN_OK:
+                        Intent Checkintent = new Intent();
+                        Checkintent.putExtra("status", status);
+                        Checkintent.putExtra("location", Location);
+                        setResult(CHECK_IN_OK, intent);
+                        finish();
+                        break;
+                    case CHECK_IN_ERRPR:
+                        finish();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     private void init() {
@@ -111,13 +154,19 @@ public class QRScannerActivity extends AppCompatActivity implements SurfaceHolde
     public void handleDecode(Result result) {
         inactivityTimer.onActivity();
         playBeepSoundAndVibrate();
-        String resultString = result.getText();
+        resultString = result.getText();
 
         if (TextUtils.isEmpty(resultString)) {
-            Toast.makeText(QRScannerActivity.this, "Scan failed!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(QRScannerActivity.this, "扫描失败！", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(QRScannerActivity.this, resultString, Toast.LENGTH_SHORT).show();
-            finish();
+            if (status.equals("0"))
+                CheckIn(name, account, resultString);
+            else {
+                Toast.makeText(QRScannerActivity.this, "已签到过！",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
     }
 
@@ -212,5 +261,58 @@ public class QRScannerActivity extends AppCompatActivity implements SurfaceHolde
             mediaPlayer.seekTo(0);
         }
     };
+
+    /* 进行签到 */
+    private void CheckIn(String name, String account, final String location){
+        final String url = "http://192.168.0.103:8080/test1_war_exploded/CheckInServlet?" +
+                "name=" + name +
+                "&account=" + account +
+                "&location=" + location;
+        HttpUtil.sendOkHttpRequest(url, new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Looper.prepare();
+                Toast.makeText(QRScannerActivity.this, "访问网络失败，请重试",
+                        Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                assert response.body() != null;
+                String result = response.body().string();
+                if (result.equals("success")){
+                    Looper.prepare();
+                    Log.d(TAG, "onResponse: 签到成功");
+                    Toast.makeText(QRScannerActivity.this, "签到成功",
+                            Toast.LENGTH_SHORT).show();
+                    status = "1";
+                    Location = location;
+                    Message message = new Message();
+                    message.what = CHECK_IN_OK;
+                    Checkhandler.sendMessage(message);      // 发送消息
+                    Looper.loop();
+                } else if (result.equals("fail")){
+                    Looper.prepare();
+                    Toast.makeText(QRScannerActivity.this, "签到失败",
+                            Toast.LENGTH_SHORT).show();
+                    Message message = new Message();
+                    message.what = CHECK_IN_ERRPR;
+                    Checkhandler.sendMessage(message);      // 发送消息
+                    Looper.loop();
+                } else if (result.equals("isChecked")){
+                    Looper.prepare();
+                    Toast.makeText(QRScannerActivity.this, "该位置上已有人",
+                            Toast.LENGTH_SHORT).show();
+                    Message message = new Message();
+                    message.what = CHECK_IN_ERRPR;
+                    Checkhandler.sendMessage(message);      // 发送消息
+                    Looper.loop();
+                }
+
+            }
+        });
+    }
 
 }

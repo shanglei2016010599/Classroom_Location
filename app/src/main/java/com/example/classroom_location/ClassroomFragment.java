@@ -178,7 +178,7 @@ public class ClassroomFragment extends Fragment {
 
     /* 获取所有学生的信息，以JSON数据格式存储 */
     private void Init(){
-        String url = "http://192.168.0.102:8080/test1_war_exploded/InitServlet";
+        String url = "http://192.168.0.103:8080/test1_war_exploded/InitServlet";
         HttpUtil.sendOkHttpRequest(url, new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

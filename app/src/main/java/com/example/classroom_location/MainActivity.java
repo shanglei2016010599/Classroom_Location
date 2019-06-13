@@ -9,9 +9,14 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -30,6 +35,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,12 +47,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -53,13 +69,23 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawerLayout;
     private Dialog dialog;
 
-    private final static String username = "Dell";
-    private final static String mail = "Dell@gmail.com";
+    private String account = "";
 
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
     private CircleImageView icon_image;
     private Uri imageUri;
+
+    private SharedPreferences preferences;
+    private String responseData;
+    private static final int INIT = 0;
+    private static final int CHECK_IN = 3;
+    private static final int CHECK_IN_OK = 4;
+    private static final String TAG = "MainActivity";
+    private Handler handler; // 定义一个android.os.Handler对象
+    private User user;
+
+    private String location = "";
 
     /* 碎片切换 */
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -78,6 +104,7 @@ public class MainActivity extends AppCompatActivity{
         }
     };
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +114,29 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        account = preferences.getString("account", "2016010599");
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case INIT:
+                        try {
+                            parseJSON(responseData);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        };
+
+        InitDrawer();
 
         ActionBar actionBar = getSupportActionBar();
         if ( actionBar != null ){
@@ -148,7 +198,7 @@ public class MainActivity extends AppCompatActivity{
                 super.onDrawerOpened(drawerView);
                 /* 动态修改用户信息 */
                 TextView Username = findViewById(R.id.username);
-                TextView Mail = findViewById(R.id.mail);
+                TextView Account = findViewById(R.id.account);
                 icon_image = findViewById(R.id.icon_image);
                 icon_image.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -156,8 +206,16 @@ public class MainActivity extends AppCompatActivity{
                         ChangeHeadIcon();
                     }
                 });
-                Username.setText(username);
-                Mail.setText(mail);
+                Username.setText(user.getName());
+                Account.setText(user.getAccount());
+                /* 利用Glide加载图片 */
+//                String imageurl = "http://192.168.0.103:8080/test1_war_exploded/head_icon/image.jpg";
+                if (user.getUrl() != null){
+                    Glide.with(MainActivity.this).load(user.getUrl()).into(icon_image);
+//                    Glide.with(MainActivity.this).load(imageurl).into(icon_image);
+                } else {
+                    Glide.with(MainActivity.this).load(R.drawable.nav_head).into(icon_image);
+                }
             }
 
             @Override
@@ -198,7 +256,10 @@ public class MainActivity extends AppCompatActivity{
             case R.id.QRCode:
                 Intent intent = new Intent(MainActivity.this,
                         QRScannerActivity.class);
-                startActivity(intent);
+                intent.putExtra("name", user.getName());
+                intent.putExtra("account", user.getAccount());
+                intent.putExtra("status", user.getStatus());
+                startActivityForResult(intent, CHECK_IN);
                 break;
         }
         return true;
@@ -268,6 +329,7 @@ public class MainActivity extends AppCompatActivity{
                                 openInputStream(imageUri));
                         icon_image.setImageBitmap(bitmap);
                         dialog.cancel();
+                        up();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -277,9 +339,17 @@ public class MainActivity extends AppCompatActivity{
                 if (resultCode == RESULT_OK){
                     if (data != null) {
                         handleImageOnKitKat(data);
+                        up();
                     }
                 }
                 break;
+            case CHECK_IN:
+                if (resultCode == CHECK_IN_OK){
+                    if (data != null){
+                        location = Objects.requireNonNull(data.getExtras()).getString("location");
+                        Log.d(TAG, "onActivityResult: " + location);
+                    }
+                }
             default:
                 break;
         }
@@ -377,6 +447,82 @@ public class MainActivity extends AppCompatActivity{
         else {
             Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void InitDrawer(){
+        String url = "http://192.168.0.103:8080/test1_war_exploded/DrawerServlet?" +
+                "account=" + account;
+        HttpUtil.sendOkHttpRequest(url, new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Looper.prepare();
+                Toast.makeText(MainActivity.this, "访问网络失败，请重试",
+                        Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                assert response.body() != null;
+                responseData = response.body().string();
+                Log.d(TAG, "onResponse: " + responseData);
+                Message message = new Message();
+                message.what = INIT;
+                handler.sendMessage(message);      // 发送消息
+            }
+        });
+    }
+
+    /* 解析获取到的JSON数据 */
+    private void parseJSON(String jsonData) throws JSONException {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "parseJSONWithGSON: " + jsonData);
+        user = new User(jsonObject.getString("id"), jsonObject.getString("account"),
+                jsonObject.getString("password"), jsonObject.getString("name"),
+                jsonObject.getString("url"), jsonObject.getString("message"),
+                jsonObject.getString("status"), jsonObject.getString("count"),
+                jsonObject.getString("location"));
+        Log.d(TAG, "parseJSONWithGSON: id is " + user.getId() + "\taccount is " +
+                user.getAccount() + "\tpassword is " + user.getPassword() + "\tname is " +
+                user.getName() + "\nurl is " + user.getUrl() + "\nmessage is " + user.getMessage() +
+                "\nstatus is " + user.getStatus() + "\tcount is " + user.getCount() +
+                "\tlocation is " + user.getLocation());
+    }
+
+    // 上传监听事件
+    public void up() {
+        Bitmap bitmap = ((BitmapDrawable) icon_image.getDrawable()).getBitmap();
+        if (bitmap==null) {
+            Toast.makeText(MainActivity.this, "未选择头像", Toast.LENGTH_SHORT).show();
+        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        assert bitmap != null;
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte [] bytes = stream.toByteArray();
+//        String image = Base64.encodeToString(bytes, Base64.DEFAULT);
+        Log.d(TAG, "up: length : " + new String(bytes, StandardCharsets.ISO_8859_1).length());
+        Log.d(TAG, "up: " + bytes.length);
+        String url = "http://192.168.0.103:8080/test1_war_exploded/ImageServlet";
+        HttpUtil.sendOkHttpRequestByPost(url,"image", bytes, new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d(TAG, "onFailure: error: " + e.toString());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Log.d(TAG, "onResponse: " + response);
+                assert response.body() != null;
+                responseData = response.body().string();
+                Log.d(TAG, "onResponse: " + responseData);
+            }
+        });
     }
 
 }
