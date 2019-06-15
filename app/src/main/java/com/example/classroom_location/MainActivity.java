@@ -3,6 +3,7 @@ package com.example.classroom_location;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -33,6 +34,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -48,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +59,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity{
     private Dialog dialog;
 
     private String account = "";
+    private String type = "";
 
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity{
     private static final int INIT = 0;
     private static final int CHECK_IN = 3;
     private static final int CHECK_IN_OK = 4;
+    private static final int CHANGE_ICON_OK = 5;
+    private static final int END_CLASS_OK = 6;
     private static final String TAG = "MainActivity";
     private Handler handler; // 定义一个android.os.Handler对象
     private User user;
@@ -114,9 +119,14 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         mDrawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.inflateMenu(R.menu.nav_menu);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        account = preferences.getString("account", "2016010599");
+        account = preferences.getString("account", "");
+
+        Intent intent = getIntent();
+        type = intent.getStringExtra("type");
+        Log.d(TAG, "onCreate types is " + type);
 
         handler = new Handler(){
             @Override
@@ -129,6 +139,13 @@ public class MainActivity extends AppCompatActivity{
                             e.printStackTrace();
                         }
                         break;
+                    case CHANGE_ICON_OK:
+                        InitDrawer();
+                        Toast.makeText(MainActivity.this, "更换头像成功",
+                                Toast.LENGTH_SHORT).show();
+                    case END_CLASS_OK:
+                        Toast.makeText(MainActivity.this, "下课成功",
+                                Toast.LENGTH_SHORT).show();
                     default:
                         break;
                 }
@@ -209,12 +226,18 @@ public class MainActivity extends AppCompatActivity{
                 Username.setText(user.getName());
                 Account.setText(user.getAccount());
                 /* 利用Glide加载图片 */
-//                String imageurl = "http://192.168.0.103:8080/test1_war_exploded/head_icon/image.jpg";
                 if (user.getUrl() != null){
-                    Glide.with(MainActivity.this).load(user.getUrl()).into(icon_image);
+//                    Glide.with(MainActivity.this).clear(icon_image);
+
+                    Glide.with(MainActivity.this)
+                            .load(user.getUrl())
+                            .signature(new ObjectKey(System.currentTimeMillis()))
+                            .into(icon_image);
+                    Log.d(TAG, "onDrawerOpened: " + user.getUrl());
 //                    Glide.with(MainActivity.this).load(imageurl).into(icon_image);
                 } else {
                     Glide.with(MainActivity.this).load(R.drawable.nav_head).into(icon_image);
+                    Log.d(TAG, "onDrawerOpened: error");
                 }
             }
 
@@ -242,7 +265,11 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.toolbar, menu);
+        if (type.equals("student"))
+            getMenuInflater().inflate(R.menu.toolbar_student, menu);
+        else if (type.equals("teacher")){
+            getMenuInflater().inflate(R.menu.toolbar_teacher, menu);
+        }
         return true;
     }
 
@@ -250,9 +277,11 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            /* 打开左侧菜单栏 */
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
+            /* 打开相机，扫描二维码签到，学生端 */
             case R.id.QRCode:
                 Intent intent = new Intent(MainActivity.this,
                         QRScannerActivity.class);
@@ -260,6 +289,48 @@ public class MainActivity extends AppCompatActivity{
                 intent.putExtra("account", user.getAccount());
                 intent.putExtra("status", user.getStatus());
                 startActivityForResult(intent, CHECK_IN);
+                break;
+            /* 将所有学生的签到状态置为0,即下课，教师端 */
+            case R.id.END:
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle("提示");
+                dialog.setMessage("确定要下课吗");
+                dialog.setCancelable(false);
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        HttpUtil.sendOkHttpRequest(URL.url + "EndServlet",
+                                new okhttp3.Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+                                        Looper.prepare();
+                                        Toast.makeText(MainActivity.this, "访问网络失败，请重试",
+                                                Toast.LENGTH_SHORT).show();
+                                        e.printStackTrace();
+                                        Looper.loop();
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        assert response.body() != null;
+                                        responseData = response.body().string();
+                                        Log.d(TAG, "onResponse: " + responseData);
+                                        Message message = new Message();
+                                        message.what = END_CLASS_OK;
+                                        handler.sendMessage(message);      // 发送消息
+                                    }
+                                });
+                    }
+                });
+                dialog.show();
+                break;
+            default:
                 break;
         }
         return true;
@@ -450,7 +521,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void InitDrawer(){
-        String url = "http://192.168.0.103:8080/test1_war_exploded/DrawerServlet?" +
+        String url = URL.url + "DrawerServlet?" +
                 "account=" + account;
         HttpUtil.sendOkHttpRequest(url, new okhttp3.Callback() {
             @Override
@@ -505,14 +576,21 @@ public class MainActivity extends AppCompatActivity{
         assert bitmap != null;
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte [] bytes = stream.toByteArray();
-//        String image = Base64.encodeToString(bytes, Base64.DEFAULT);
-        Log.d(TAG, "up: length : " + new String(bytes, StandardCharsets.ISO_8859_1).length());
+        String image = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+//        Log.d(TAG, "up: length : " + new String(bytes, StandardCharsets.ISO_8859_1).length());
         Log.d(TAG, "up: " + bytes.length);
-        String url = "http://192.168.0.103:8080/test1_war_exploded/ImageServlet";
-        HttpUtil.sendOkHttpRequestByPost(url,"image", bytes, new okhttp3.Callback() {
+        Log.d(TAG, "up: " + image.length());
+        String url = URL.url + "ImageServlet";
+        HttpUtil.sendOkHttpRequestByPost(url,"image", image, "account", user.getAccount(), new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d(TAG, "onFailure: error: " + e.toString());
+                Looper.prepare();
+                Toast.makeText(MainActivity.this, "访问网络失败，请重试",
+                        Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Looper.loop();
             }
 
             @Override
@@ -520,6 +598,9 @@ public class MainActivity extends AppCompatActivity{
                 Log.d(TAG, "onResponse: " + response);
                 assert response.body() != null;
                 responseData = response.body().string();
+                Message message = new Message();
+                message.what = CHANGE_ICON_OK;
+                handler.sendMessage(message);      // 发送消息
                 Log.d(TAG, "onResponse: " + responseData);
             }
         });

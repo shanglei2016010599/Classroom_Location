@@ -48,7 +48,17 @@ public class StudentActivity extends AppCompatActivity {
             Glide.with(this).load(studentImageId).into(studentImageView);
         }
         if (studentMessage != null){
-            studentContentText.setText(studentMessage);
+            String[] msgs = studentMessage.split("#");
+            StringBuilder message = new StringBuilder();
+            System.out.println("length:" + msgs.length);
+            for (int i = 0; i < msgs.length; i++){
+                if (i == 0){
+                    message.append(msgs[i]);
+                } else {
+                    message.append("\n").append(msgs[i]);
+                }
+            }
+            studentContentText.setText(message.toString());
         } else {
             String studentContent = generateStudentContent(studentName);
             studentContentText.setText(studentContent);

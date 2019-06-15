@@ -13,6 +13,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -27,11 +29,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private EditText account_edit;
     private EditText password_edit;
     private SharedPreferences preferences;
+    private RadioButton student, teacher;
 //    private final static String mAccount = "2016010599";
 //    private final static String mPassword = "123456";
     private final static String TAG = "LoginActivity";
     String account;
     String password;
+    String type;
 
     //    private final String TAG = "LoginActivity";
 
@@ -46,7 +50,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         RememberPass = findViewById(R.id.remember_password);
         account_edit = findViewById(R.id.account_edit);
         password_edit = findViewById(R.id.password_edit);
+        student = findViewById(R.id.student);
+        teacher = findViewById(R.id.teacher);
         Button logIn = findViewById(R.id.Login_btn);
+
 
         boolean isRemember = preferences.getBoolean("remember_password", false);
         boolean autoLogin = preferences.getBoolean("isAuto", false);
@@ -64,9 +71,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         if (v.getId() == R.id.Login_btn) {
             account = account_edit.getText().toString();
             password = password_edit.getText().toString();
-            HttpUtil.sendOkHttpRequest("http://192.168.0.103:8080/test1_war_exploded/LoginServlet?" +
+            if (teacher.isChecked()){
+                type = "teacher";
+            } else {
+                type = "student";
+            }
+            HttpUtil.sendOkHttpRequest(URL.url + "LoginServlet?" +
                     "account=" + account +
-                    "&password=" + password, new okhttp3.Callback() {
+                    "&password=" + password +
+                    "&type=" + type, new okhttp3.Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     Looper.prepare();
@@ -89,16 +102,25 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                             editor.putBoolean("remember_password", true);
                             editor.putString("account", account);
                             editor.putString("password", password);
+                            editor.putString("type", type);
                             editor.putBoolean("isAuto", true);
                         } else {
                             editor.clear();
                         }
                         editor.apply();
+
                         Intent intent = new Intent(Login.this, MainActivity.class);
+                        intent.putExtra("type", type);
                         startActivity(intent);
                         Looper.loop();
                     } else if (result.equals("fail")){
+                        Looper.prepare();
                         Toast.makeText(Login.this, "账号或密码错误",
+                                Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    } else if (result.equals("type error")){
+                        Looper.prepare();
+                        Toast.makeText(Login.this, "身份错误，请重新选择",
                                 Toast.LENGTH_SHORT).show();
                         Looper.loop();
                     }
@@ -128,9 +150,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private void AutoLogin(){
         String account = preferences.getString("account", "");
         String password = preferences.getString("password", "");
-        HttpUtil.sendOkHttpRequest("http://192.168.0.103:8080/test1_war_exploded/LoginServlet?" +
+        final String type = preferences.getString("type", "");
+        HttpUtil.sendOkHttpRequest(URL.url + "LoginServlet?" +
                 "account=" + account +
-                "&password=" + password, new okhttp3.Callback() {
+                "&password=" + password +
+                "&type=" + type, new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Looper.prepare();
@@ -147,10 +171,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                 if (result.equals("success")){
                     Log.d(TAG, "onResponse: 自动登录成功");
                     Intent intent = new Intent(Login.this, MainActivity.class);
+                    intent.putExtra("type", type);
                     startActivity(intent);
                 } else if (result.equals("fail")){
                     Looper.prepare();
                     Toast.makeText(Login.this, "账号或密码错误",
+                            Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                } else if (result.equals("type error")){
+                    Looper.prepare();
+                    Toast.makeText(Login.this, "身份错误，请重新选择",
                             Toast.LENGTH_SHORT).show();
                     Looper.loop();
                 }
@@ -166,5 +196,4 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         password_edit.setText(password);
         RememberPass.setChecked(true);
     }
-
 }

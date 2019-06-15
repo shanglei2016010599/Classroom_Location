@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 
 import java.util.List;
 
@@ -71,10 +72,13 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         if (student.getStatus().equals("1")){
             viewHolder.studentName.setText(student.getName());
         } else {
-            viewHolder.studentName.setText("    " + student.getRow() + "-" + student.getCol() + "    ");
+            viewHolder.studentName.setText("  " + student.getRow() + "排" + student.getCol() + "号  ");
         }
         if (student.getImageId() == -1){
-            Glide.with(mContext).load(student.getUrl()).into(viewHolder.studentImage);
+            Glide.with(mContext)
+                    .load(student.getUrl())
+                    .signature(new ObjectKey(System.currentTimeMillis()))
+                    .into(viewHolder.studentImage);
         } else {
             Glide.with(mContext).load(student.getImageId()).into(viewHolder.studentImage);
         }

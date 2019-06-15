@@ -23,5 +23,10 @@
     <string name="dialog_img_3">取消</string>
     <string name="nav_menu_title6">退出登录</string>
     <string name="todo">TODO</string>
+    <string name="type_teacher">教师</string>
+    <string name="type_student">学生</string>
+    <string name="toolbar_end_title">下课</string>
+    <string name="btn_send_text">发送</string>
+    <string name="input_text_hint">输入你想说的..</string>
 
 </resources>

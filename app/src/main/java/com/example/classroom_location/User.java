@@ -6,11 +6,11 @@ public class User {
 
     private String name;
 
-    private String url;
+    private String url = null;
 
     private String location;
 
-    private String message;
+    private String message = null;
 
     private String status;
 
@@ -19,6 +19,16 @@ public class User {
     private String account;
 
     private String password;
+
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getAccount() {
         return account;

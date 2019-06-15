@@ -264,7 +264,7 @@ public class QRScannerActivity extends AppCompatActivity implements SurfaceHolde
 
     /* 进行签到 */
     private void CheckIn(String name, String account, final String location){
-        final String url = "http://192.168.0.103:8080/test1_war_exploded/CheckInServlet?" +
+        final String url = URL.url + "CheckInServlet?" +
                 "name=" + name +
                 "&account=" + account +
                 "&location=" + location;

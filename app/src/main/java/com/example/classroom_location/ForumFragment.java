@@ -59,11 +59,11 @@ public class ForumFragment extends Fragment {
     }
 
     private void initMsgs(){
-        Msg msg1 = new Msg("Hello guy.", Msg.TYPE_RECEIVED);
+        Msg msg1 = new Msg("大家有什么问题可以先留言。", Msg.TYPE_RECEIVED);
         msgList.add(msg1);
-        Msg msg2 = new Msg("Hello. Who is that?", Msg.TYPE_SENT);
+        Msg msg2 = new Msg("老师，刚才你好像有道题讲错了。", Msg.TYPE_SENT);
         msgList.add(msg2);
-        Msg msg3 = new Msg("This is Tom. Nice talking to you.", Msg.TYPE_RECEIVED);
+        Msg msg3 = new Msg("好的，谢谢。让我们看看有没有错。", Msg.TYPE_RECEIVED);
         msgList.add(msg3);
     }
 

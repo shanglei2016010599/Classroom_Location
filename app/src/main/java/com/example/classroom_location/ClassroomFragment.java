@@ -122,8 +122,8 @@ public class ClassroomFragment extends Fragment {
     public void initStudents(){
         studentList.clear();
         for ( int i = 0; i < 48; i++ ){
-            Random random = new Random();
-            int index = random.nextInt(6);
+//            Random random = new Random();
+            int index = R.drawable.image;
             int row, col;
             if ( (i + 1) % 8 != 0){
                 row = (i + 1) / 8 + 1;
@@ -132,7 +132,7 @@ public class ClassroomFragment extends Fragment {
                 row = (i + 1) / 8;
                 col = 8;
             }
-            Student student = new Student("第" + (i + 1) + "个同学", ImageId[index], row, col);
+            Student student = new Student("第" + (i + 1) + "个同学", index, row, col);
             studentList.add(student);
         }
     }
@@ -143,7 +143,7 @@ public class ClassroomFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -151,8 +151,8 @@ public class ClassroomFragment extends Fragment {
                 Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable(){
                     @Override
                     public void run() {
+                        initStudents();
                         Init();
-                        updateStudentList();
                         adapter.notifyDataSetChanged();
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -178,7 +178,7 @@ public class ClassroomFragment extends Fragment {
 
     /* 获取所有学生的信息，以JSON数据格式存储 */
     private void Init(){
-        String url = "http://192.168.0.103:8080/test1_war_exploded/InitServlet";
+        String url = URL.url + "InitServlet";
         HttpUtil.sendOkHttpRequest(url, new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -206,6 +206,7 @@ public class ClassroomFragment extends Fragment {
         Gson gson = new Gson();
         List<User> userList = gson.fromJson(jsonData, new TypeToken<List<User>>(){}.getType());
         Log.d(TAG, "parseJSONWithGSON: " + userList);
+        users.clear();
         for (User user : userList){
             Log.d(TAG, "parseJSONWithGSON: " + user.getName());
             if (user.getStatus().equals("1")){
