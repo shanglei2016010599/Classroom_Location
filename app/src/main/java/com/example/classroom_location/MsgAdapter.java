@@ -52,13 +52,13 @@ public class MsgAdapter extends RecyclerView.Adapter<MsgAdapter.ViewHolder> {
             /* 如果是收到的消息，则显示左边的消息布局，将右边的消息布局隐藏 */
             viewHolder.leftLayout.setVisibility(View.VISIBLE);
             viewHolder.rightLayout.setVisibility(View.GONE);
-            viewHolder.leftMsg.setText(msg.getContent());
+            viewHolder.leftMsg.setText(msg.getMessage());
         }
         else if (msg.getType() == Msg.TYPE_SENT){
             /* 如果是发出的消息，则显示右边的消息布局，将左边的消息布局隐藏 */
             viewHolder.rightLayout.setVisibility(View.VISIBLE);
             viewHolder.leftLayout.setVisibility(View.GONE);
-            viewHolder.rightMsg.setText(msg.getContent());
+            viewHolder.rightMsg.setText(msg.getMessage());
         }
     }
 

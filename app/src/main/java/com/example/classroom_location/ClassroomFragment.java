@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -44,10 +42,10 @@ public class ClassroomFragment extends Fragment {
 //            new Student("第六张图", R.drawable.image6),
 //    };
 
-    private int[] ImageId = {
-            R.drawable.image1, R.drawable.image2, R.drawable.image3,
-            R.drawable.image4, R.drawable.image5, R.drawable.image6,
-    };
+//    private int[] ImageId = {
+//            R.drawable.image1, R.drawable.image2, R.drawable.image3,
+//            R.drawable.image4, R.drawable.image5, R.drawable.image6,
+//    };
 
     private List<Student> studentList = new ArrayList<>();
 

@@ -76,6 +76,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
             } else {
                 type = "student";
             }
+            Log.d(TAG, "onClick: " + URL.url + "LoginServlet?" +
+                    "account=" + account +
+                    "&password=" + password +
+                    "&type=" + type);
             HttpUtil.sendOkHttpRequest(URL.url + "LoginServlet?" +
                     "account=" + account +
                     "&password=" + password +

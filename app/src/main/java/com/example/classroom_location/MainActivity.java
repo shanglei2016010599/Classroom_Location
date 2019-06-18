@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity{
     private static final int END_CLASS_OK = 6;
     private static final String TAG = "MainActivity";
     private Handler handler; // 定义一个android.os.Handler对象
-    private User user;
+    private static User user;
 
     private String location = "";
 
@@ -143,9 +143,11 @@ public class MainActivity extends AppCompatActivity{
                         InitDrawer();
                         Toast.makeText(MainActivity.this, "更换头像成功",
                                 Toast.LENGTH_SHORT).show();
+                        break;
                     case END_CLASS_OK:
                         Toast.makeText(MainActivity.this, "下课成功",
                                 Toast.LENGTH_SHORT).show();
+                        break;
                     default:
                         break;
                 }
@@ -354,7 +356,7 @@ public class MainActivity extends AppCompatActivity{
         // 以下这两句是为了保证按钮可以水平满屏
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        // 设置显示位置
+        // 设置显示位置=
         dialog.onWindowAttributesChanged(layoutParams);
         // 设置点击外围解散
         dialog.setCanceledOnTouchOutside(true);
@@ -604,6 +606,10 @@ public class MainActivity extends AppCompatActivity{
                 Log.d(TAG, "onResponse: " + responseData);
             }
         });
+    }
+
+    public static String getUserName(){
+        return user.getName();
     }
 
 }
